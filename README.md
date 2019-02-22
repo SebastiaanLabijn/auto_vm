@@ -1,7 +1,11 @@
 # auto_vm
 This repository aims to build a new Virual Machine with installed OS without a single user interaction required.
-<br>
-Supported Linux OS 64bit: ArchLinux, CentOS and Fedora
+
+## Supported OS 64bit
+
+* ArchLinux
+* CentOS 
+* Fedora
 
 ## How to use
 
