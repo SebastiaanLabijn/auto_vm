@@ -1,0 +1,4 @@
+# ignore created vagrant boxes
+./boxes/
+# ignore folder with installation isos
+./isos/
