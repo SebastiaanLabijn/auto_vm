@@ -1,2 +1,3 @@
 # auto_vm
-Creates Virtual Machines from scratch and installs the base OS.
+This repository aims to build a new Virual Machine with installed OS without a single user interaction required.
+Supported Linux OS: ArchLinux, CentOS, Fedora, Red Hat
