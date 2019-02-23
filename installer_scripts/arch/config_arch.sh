@@ -4,6 +4,12 @@
 # Configure installation itself
 ###
 
+# caputre passed script arguments
+os_root_pwd="$1"
+os_user_vagrant="$2"
+os_user_name="$3"
+os_user_pwd="$4"
+
 # time and date
 ln -sf /usr/share/zoneinfo/Europe/Brussels /etc/localtime
 hwclock --systohc
@@ -24,26 +30,43 @@ echo '%wheel ALL=(ALL) ALL' >>  /etc/sudoers
 
 # set root pwd
 username="root"
-user_pwd=$(openssl passwd -1 "arch")
+user_pwd=$(openssl passwd -1 "${os_root_pwd}")
 usermod -p ${user_pwd} ${username}
+
+# Create user
+username="${os_user_name}"
+# Create vagrant user
+if [ ! -z "${username}" -and "${username}" != "" ]
+then
+	useradd ${username}
+	user_pwd=$(openssl passwd -1 "${os_user_pwd}")
+	usermod -p ${user_pwd} ${username}
+	# add to wheel group if needed
+	if [ "${os_user_admin}" -eq "1" ]
+	then
+		usermod -aG wheel ${username}
+	fi
+fi
 
 # Create vagrant user
-username="vagrant"
-useradd ${username}
-user_pwd=$(openssl passwd -1 "${username}")
-usermod -p ${user_pwd} ${username}
-usermod -aG wheel ${username}
+if [ "${os_user_vagrant}" -eq "1" ]
+then
+	username="vagrant"
+	useradd ${username}
+	user_pwd=$(openssl passwd -1 "${username}")
+	usermod -p ${user_pwd} ${username}
+	usermod -aG wheel ${username}
+fi
 
 # network & hosts
-box_name="archvm"
-echo "${box_name}" > /etc/hostname
+echo "${os_hostname}" > /etc/hostname
 
 echo '# Static table lookup for hostnames.' > /etc/hosts
 echo '# See hosts(5) for details.' >> /etc/hosts
 echo '#' >> /etc/hosts
 echo -e "127.0.0.1\tlocalhost" >> /etc/hosts
 echo -e "::1\t\tlocalhost" >> /etc/hosts
-echo -e "127.0.1.1\t${box_name}.localdomain ${box_name}" >> /etc/hosts
+echo -e "127.0.1.1\t${os_hostname}.localdomain ${os_hostname}" >> /etc/hosts
 
 systemctl enable dhcpcd
 systemctl start dhcpcd
