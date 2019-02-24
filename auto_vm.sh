@@ -17,12 +17,13 @@ parameters_ok="1"
 function check_parameters() {
 	echo -e "${text_title}Checking value critical paramters${text_def}"
 	# flags
-	accepted_value=("0" "1")
-	check_parameter_isset_with_values "os_user_admin" "${os_user_admin}" "${accepted_value[@]}"
-	check_parameter_isset_with_values "os_user_vagrant" "${os_user_vagrant}" "${accepted_value[@]}"
-	check_parameter_isset_with_values "vagrant_box_create" "${vagrant_box_create}" "${accepted_value[@]}"
-	check_parameter_isset_with_values "vagrant_box_overwrite" "${vagrant_box_overwrite}" "${accepted_value[@]}"
-	check_parameter_isset_with_values "vm_replace" "${vm_replace}" "${accepted_value[@]}"
+	accepted_values=("0" "1")
+	check_parameter_isset_with_values "os_user_admin" "${os_user_admin}" "${accepted_values[@]}"
+	check_parameter_isset_with_values "os_user_vagrant" "${os_user_vagrant}" "${accepted_values[@]}"
+	check_parameter_isset_with_values "vagrant_box_create" "${vagrant_box_create}" "${accepted_values[@]}"
+	check_parameter_isset_with_values "vagrant_box_overwrite" "${vagrant_box_overwrite}" "${accepted_values[@]}"
+	check_parameter_isset_with_values "vm_replace" "${vm_replace}" "${accepted_values[@]}"
+	check_parameter_isset_with_values "vagrant_create_user" "${vagrant_create_user}" "${accepted_values[@]}"
 	# check if paths are correct
 	check_path "vm_path" "${vm_path}"
 	check_path "os_iso_path" "${os_iso_path}"
@@ -34,8 +35,10 @@ function check_parameters() {
 	# filename for iso must be set
 	check_parameter_isset "os_iso_name" "${os_iso_name}"
 	# check if value for chosen distribution is correct
-	accepted_value=("ArchLinux_64" "Fedora_64" "RedHat_64")
-	check_parameter_isset_with_values "vm_os" "${vm_os}" "${accepted_value[@]}"
+	accepted_values=("arch" "centos" "fedora" "redhat")
+	check_parameter_isset_with_values "os_name" "${os_name}" "${accepted_values[@]}"
+	accepted_values=("ArchLinux_64" "Fedora_64" "RedHat_64")
+	check_parameter_isset_with_values "vm_os" "${vm_os}" "${accepted_values[@]}"
 }
 
 
@@ -88,7 +91,20 @@ function check_path(){
 	
 	if [ -z "${value}" ] || [ ! -d "${value}" ]
 	then
+		echo "Current path in check: ${PWD}"
 		echo -e "${text_err}Path for parameter ${name} (value: ${value}) does not exist!"
+		parameters_ok="0"
+	fi
+}
+
+# Check if a "file" exists
+function check_file(){
+	name="$1"
+	value="$2"
+	
+	if [ -z "${value}" ] || [ ! -f "${value}" ]
+	then
+		echo -e "${text_err}File ${name} (path: ${value}) does not exist!"
 		parameters_ok="0"
 	fi
 }
@@ -108,7 +124,7 @@ function check_positive_number() {
 # performs the minimal installation of the os
 function perform_os_installation() {
 	# execute the installtion process specific for the os
-	installer_script='./installer_scripts/'"${os_name}"'/vm_install_'"${os_name}"'.sh'
+	installer_script='./installer_scripts/vm_install_'"${os_name}"'.sh'
 	if [ ! -f "${installer_script}" ]
 	then
 		echo "Could not launch install script ${installer_script} because it does not exist!"
@@ -144,10 +160,10 @@ function vg_create_box() {
 			if [ "${vagrant_box_overwrite}" -eq "1" ]
 			then
 				# remove the box if already exists
-				echo "${text_warn}Box ${vagrant_box_name} already exists in ${vagrant_box_path}! ${text_def}Removing current box"
-				rm "${vagrant_box_name}" 2>/dev/null
+				echo -e "${text_warn}Box ${vagrant_box_name} already exists in ${vagrant_box_path}! ${text_def}Removing current box"
+				rm "${vagrant_box_path}/${vagrant_box_name}" 2>/dev/null
 			else
-				echo "${text_warn}Box ${vagrant_box_name} already exists in ${vagrant_box_path}! ${text_err}Overwrite not allowed! Skipping ..."
+				echo -e "${text_warn}Box ${vagrant_box_name} already exists in ${vagrant_box_path}! ${text_err}Overwrite not allowed! Skipping ..."
 				return
 			fi
 		fi
@@ -164,6 +180,9 @@ function vg_create_box() {
 
 start=$(date +%s)
 
+# use qwerty keyboard to send the commandos/text in right format
+loadkeys us
+
 check_parameters
 if [ "${parameters_ok}" -ne "1" ]
 then
@@ -172,10 +191,11 @@ then
 else
 	echo -e "${text_ok}Parameters set correctly${text_def}"
 fi
-#vb_create_vm
-#vb_boot_vm
-#perform_os_installation
-#vg_create_box
+
+vb_create_vm
+vb_boot_vm
+perform_os_installation
+vg_create_box
 
 stop=$(date +%s)
 sec=$((stop - start))

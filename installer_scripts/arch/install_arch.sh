@@ -4,8 +4,6 @@
 # Installing base system
 ###
 
-echo "Passed parameters $# $*"
-sleep 5 
 # configure time & date
 timedatectl set-ntp true
 
@@ -24,7 +22,7 @@ config_script="config_arch.sh"
 mv "${config_script}" /mnt/root
 chmod 776 "/mnt/root/${config_script}"
 # Chroot into new installation and execute the config script there
-# pass along in this order: os_root_pwd, os_user_vagrant, os_user_name, os_user_pwd
-arch-chroot /mnt /root/"${config_script} $1 $2 $3 $4"
+# pass paramters along in this order: os_root_pwd, os_user_vagrant, os_user_name, os_user_pwd, os_user_admin
+arch-chroot /mnt "/root/${config_script} $1 $2 $3 $4 $5"
 # Finish installation
 poweroff

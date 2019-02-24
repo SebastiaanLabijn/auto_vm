@@ -4,13 +4,13 @@
 echo -e "${text_warn}Wait for VM to reach boot menu (10s)${text_def}"
 sleep_timer 10
 # press arrow up (ESCAPED) to go to option "installation"
-vb_keyboard_press_keys_vm "1" "up"
+vb_keyboard_press_keys_vm "1" "1" "up"
 # press tab to enter advanced boot options
-vb_keyboard_press_keys_vm "0" "tab"
+vb_keyboard_press_keys_vm "1" "0" "tab"
 # enter " text" as advanced option to launch text installer
-vb_keyboard_type_text_vm " text"
+vb_keyboard_type_text_vm " inst.text"
 # press enter to boot to text installer 
-vb_keyboard_press_keys_vm "0" "enter"
+vb_keyboard_press_keys_vm "1" "0" "enter"
 
 # Give the vm time to boot after menu to install shell
 echo -e "${text_warn}Wait for VM to boot to command line (60s)${text_def}"
@@ -34,9 +34,9 @@ then
 
 	# TODO: check how to capture this "event"
 	# press alt tab to go to "shell"
-	vb_keyboard_press_keys_vm "0" "alt" "tab"
+	vb_keyboard_press_keys_vm "1" "0" "alt" "tab"
 	vb_keyboard_type_text_vm "poweroff"
-	vb_keyboard_press_keys_vm "0" "enter"
+	vb_keyboard_press_keys_vm "1" "0" "enter"
 else
 	echo "${text_err}Could not load installer script for anaconda!"
 	vb_halt_vm

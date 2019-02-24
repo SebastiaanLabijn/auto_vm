@@ -11,6 +11,8 @@
 # If not strong enough this might crash the installer!
 os_root_pwd="rootroot"
 # Username for user account to be created during OS install (Leave bank if dont want to create extra user)
+# If installer only allows 1 user to be made
+# vagrant user will be made and os_user_name ignored
 os_user_name="sebastiaan"
 # Full name of the user
 os_user_fullname="${os_user_name}"
@@ -21,15 +23,17 @@ os_user_admin="1"
 # flag indicating if we have to make vagrant user (0 if not)
 os_user_vagrant="1"
 # hostname
-os_hostname="archvm"
+os_hostname="fedoravm"
+# domainname
+os_domainname="domain"
 
 ### Operation System parameters
 
 # (short) Name of the OS to be installed
 # Possible values: arch, centos, fedora, redhat
-os_name="arch"
+os_name="fedora"
 # Name of the iso file for the OS installer
-os_iso_name="archlinux.iso"
+os_iso_name="${os_name}.iso"
 # Path where the ISO is stored (created if doesn't exist)
 os_iso_path="./isos"
 # url where to dl the iso if not present
@@ -40,19 +44,21 @@ debian_iso_url='https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian
 fedora_ws_iso_url='https://download.fedoraproject.org/pub/fedora/linux/releases/29/Workstation/x86_64/iso/Fedora-Workstation-Live-x86_64-29-1.2.iso'
 fedora_server_iso_url='https://download.fedoraproject.org/pub/fedora/linux/releases/29/Server/x86_64/iso/Fedora-Server-dvd-x86_64-29-1.2.iso'
 # Pick the mirror you need from above
-os_iso_url="${arch_iso_url}"
+os_iso_url="${fedora_server_iso_url}"
 
 ### Virtual box parameters
 
+# Flag indicating to boot the VM headless (0, to boot vm with GUI)
+vm_headless="0"
 # Flag indicating to delete the VM if already exists and remake it (0, to keep current)
 vm_replace="1"
 # folder where to store the VM (created if doesn't exist)
 vm_path="/home/${USER}/VirtualBox VMs"
 # Name of the Virtual Machine to be shown in Virtualbox
-vm_name="ArchLinux_AutoVM"
+vm_name="Fedora_AutoVM"
 # Name of the OS as defined by VirtualBox
 # Currently supported: ArchLinux_64, Fedora_64, RedHat_64 (Use RedHat_64 for centos)
-vm_os="ArchLinux_64"
+vm_os="Fedora_64"
 # Name of the hostonly network to be used
 vm_hostonly_name="vboxnet0"
 # Display RAM size (in MB)
@@ -64,6 +70,10 @@ vm_mem_size="4096"
 
 ### Vagrant Options
 
+# Flag to indicate that a vragrant user must be made (0 to skip)
+# If installer only allows 1 user to be made
+# vagrant user will be made and os_user_name ignored
+vagrant_create_user="1"
 # Create a vagrant box if wanted (0 to skip)
 vagrant_box_create="1"
 # Overwrite the box if exists (0 to skip)
@@ -71,4 +81,4 @@ vagrant_box_overwrite="1"
 # Path where to save the box
 vagrant_box_path="./boxes"
 # Name of the box for vagrant to be created
-vagrant_box_name="arch.box"
+vagrant_box_name="${os_name}.box"

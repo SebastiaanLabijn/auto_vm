@@ -1,17 +1,18 @@
 #!/bin/bash
 
-source "parameters.sh"
+vm_name="Fedora_AutoVM"
+
 source "virtualbox.sh"
 source "utils.sh"
 
-vm_name="ArchLinuxClean"
+vb_keyboard_press_keys_vm "1" "0" "2"
+vb_keyboard_press_keys_vm "1" "0" "3"
+vb_keyboard_press_keys_vm "1" "0" "b"
+vb_keyboard_press_keys_vm "1" "0" "c"
+vb_keyboard_press_keys_vm "1" "1" "2"
+vb_keyboard_press_keys_vm "1" "1" "3"
+vb_keyboard_press_keys_vm "1" "1" "b"
+vb_keyboard_press_keys_vm "1" "1" "c"
 
-vb_keyboard_press_keys_vm "0" "b"
-
-vb_keyboard_press_keys_vm "1" "b"
-
-vb_keyboard_press_keys_vm "0" "i" "b" "c"
-
-vb_keyboard_press_keys_vm "1" "i" "b" "c"
 
 

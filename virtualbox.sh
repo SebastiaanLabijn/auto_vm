@@ -94,8 +94,14 @@ function vb_configure_vm_network() {
 
 # boots the vm headless
 function vb_boot_vm() {
-	echo -e "${text_title}Starting VM headless${text_def}"
-	vboxmanage startvm "${vm_name}" # --type headless
+	if [ "${vm_headless}" -eq "1" ]
+	then
+		echo -e "${text_title}Starting VM ${vm_name} headless${text_def}"
+		vboxmanage startvm "${vm_name}" --type headless
+	else
+		echo -e "${text_title}Starting VM ${vm_name}${text_def}"
+		vboxmanage startvm "${vm_name}"
+	fi
 }
 
 # halts the vm headless
@@ -112,24 +118,30 @@ function vb_is_vm_running(){
 # Types a line of text on the vm console
 function vb_keyboard_type_text_vm(){
 	vboxmanage controlvm "${vm_name}" keyboardputstring "$1"
-}
+		# added for DEBUGGING
+		sleep 2
+} 
 
 # Simulates pressing multiple keys on the vm console
-# Usage: vb_keyboard_press_keys_vm "0" [IS_ESCAPED] [key1] [key2] ...
+# Usage: vb_keyboard_press_keys_vm [AMOUNT_OF_TIMES] [IS_ESCAPED] [KEY_1] [KEY_2] ...
+# AMOUNT_OF_TIMES	Value indicating how much time we will press the key sequence (at least 1 or more)
 # IS_ESCAPED		If has value 1 then special escape char will be placed before the keycode
-# [key1]		The first key pressed
-# [key2]		The second key pressed (= optional)
+# KEY_1			The first key pressed
+# KEY_2			The second key pressed (= optional)
 # ...
 function vb_keyboard_press_keys_vm() {
 	key_codes_pressed=()
 	key_codes_released=()
+	amount="$1"
 	# check if we have to escape the characters
 	# if we use special escaped sign, add em as first elements to array
-	if [ ! -z "$1" -a "$1" -eq "1" ]
+	if [ ! -z "$2" -a "$2" -eq "1" ]
 	then
 		key_codes_pressed+=("E0")
 		key_codes_released+=("E0")
 	fi
+	# shift out $1 and $2
+	shift
 	shift
 	# loop all other chars and add correct keycodes
 	while [ "$#" -gt "0" ]
@@ -139,8 +151,14 @@ function vb_keyboard_press_keys_vm() {
 		shift
 	done 
 
-	# type the text in the vm
-	vboxmanage controlvm "${vm_name}" keyboardputscancode "${key_codes_pressed[@]}" "${key_codes_released[@]}"
+	for i in {1..$amount}
+	do
+		echo "${key_codes_pressed[@]}" "${key_codes_released[@]}"
+		# type the text in the vm
+		vboxmanage controlvm "${vm_name}" keyboardputscancode "${key_codes_pressed[@]}" "${key_codes_released[@]}"
+		# added for DEBUGGING
+		sleep 2
+	done
 }
 
 # Writs a file line per line to VM using vim
@@ -148,7 +166,8 @@ function vb_keyboard_press_keys_vm() {
 # LOCAL_FILE		The file on host machine
 # FILE_VM		The file to write to in VM
 function vb_write_file_to_vm() {
-	local_file="$1"	
+	# only works with full absolut path so get it
+	local_file="$1"
 	file_vm="$2"
 	
 	# temp swap to qwertz keyboard otherwise a in text will be sent as q, ...
@@ -164,13 +183,12 @@ function vb_write_file_to_vm() {
 	while read line
 	do
 		# Skip empty lines & comment lines if wanted
-		if [ ! -z "${line}" -a "${line}" != "" -a "${line}" =~ ^\s*# ]
+		if [ ! -z "${line}" ] && ! [[ "${line}" =~ ^\s*$ ]] && ! [[ "${line}" =~ ^\s*# ]]
 		then
 			vb_keyboard_type_text_vm "${line}"
 			vb_keyboard_press_keys_vm "0" "enter"
 		fi
 	done < "${local_file}"
-
 
 	# enter command mode (= esc)
 	vb_keyboard_press_keys_vm "0" "esc"
@@ -179,7 +197,7 @@ function vb_write_file_to_vm() {
 	vb_keyboard_type_text_vm ":w"
 	vb_keyboard_press_keys_vm "0" "enter"
 
-	# quit vi (= :q)
-	vb_keyboard_type_text_vm ":q"
+	# quit vi (= :q!)
+	vb_keyboard_type_text_vm ":q!"
 	vb_keyboard_press_keys_vm "0" "enter"
 }

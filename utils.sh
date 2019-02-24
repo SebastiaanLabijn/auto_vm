@@ -37,6 +37,8 @@ function sleep_timer(){
 
 ### Keyboard scan codes
 
+# usefull website: https://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
+
 # Returns the hex code when a key (=$1) is pressed down
 function keyb_get_keycode_pressed() {
 	key_code_pressed=""
@@ -66,6 +68,7 @@ function keyb_get_keycode_pressed() {
 		up) 		key_code_pressed="48";;
 		# special keys	
 		alt)		key_code_pressed="38";;
+		back_sp)	key_code_pressed="0E";;
 		ctrl)		key_code_pressed="1D";;
 		enter) 	key_code_pressed="1C";;
 		esc)		key_code_pressed="01";;
@@ -107,6 +110,7 @@ function keyb_get_keycode_released() {
 		up) 		key_code_released="C8";;
 		# special keys	
 		alt)		key_code_released="B8";;
+		back_sp)	key_code_released="8E";;
 		ctrl)		key_code_released="9D";;
 		enter) 	key_code_released="9C";;
 		esc)		key_code_released="81";;
@@ -117,4 +121,9 @@ function keyb_get_keycode_released() {
 		*) echo "Unknown key $1 pressed."; exit 1;;
 	esac
 	echo "${key_code_released}"
+}
+
+# Get the full absolute path for a file
+function absolute_path {
+  (cd "$(dirname $1)" &>/dev/null && printf "%s/%s" "$PWD" "${1##*/}")
 }
