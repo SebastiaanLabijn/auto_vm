@@ -61,6 +61,8 @@ vm_name="Fedora_AutoVM"
 vm_os="Fedora_64"
 # Name of the hostonly network to be used
 vm_hostonly_name="vboxnet0"
+# ip of the hostonly network
+vm_hostonly_ip="192.168.200.200"
 # Display RAM size (in MB)
 vm_vram_size="16"
 # Amount of CPUs used

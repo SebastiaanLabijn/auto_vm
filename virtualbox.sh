@@ -54,7 +54,7 @@ function vb_mount_install_medium() {
 	# if file does not exist, dl it
 	if [ ! -f "${os_iso_path}/${os_iso_name}" ]
 	then
-		echo -e "${text_warn}Install iso not present. Downloading iso ... ${text_def}"
+		echo -e "${text_warn}Install iso ${os_iso_path}/${os_iso_name} not present. Downloading iso ... ${text_def}"
 		mkdir -p "${os_iso_path}"
 		wget "${os_iso_url}" -O "${os_iso_path}/${os_iso_name}"
 	else

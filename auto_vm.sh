@@ -134,11 +134,24 @@ function perform_os_installation() {
 	source "${installer_script}"
 	
 	echo -en "${text_warn}Installation in progress .."
-	# Sleep as long as installiong is in progress
-	while [ $(vb_is_vm_running) -eq "1" ]
+	# Sleep as long as installiong is in progress or we cant ping the machine (which means a reboot has happened)
+	ping_success="0"
+	while [ $(vb_is_vm_running) -eq "1" -a "${ping_success}" -eq "0" ]
 	do
 		echo -en "."
 		sleep 5
+		# press enter in the VM to trigger a reboot if needed		
+		vb_keyboard_press_keys_vm "1" "0" "enter"		
+		# test if we can ping the machine
+		# if we can ping then the installation is complete and a reboot has happened
+		# otherwise hostonly adapter should not be pingable
+		if [ ping -c 1 "${vm_hostonly_ip}" &> /dev/null ]
+		then
+			echo -e "${text_ok}Ping succes!${text_def}"
+			ping_success="1"
+		else
+			echo -e "${text_err}Ping failed!${text_def}"
+		fi
 	done
 	echo -e "${text_def}"
 
